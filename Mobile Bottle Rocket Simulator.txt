@@ -1,5 +1,6 @@
 from math import *
 watDensity = 1000 #kg/m^3
+airDensity = 1.275 #kg/m^3
 gravity = 9.8 #m/s^2
 accuracy = 3 # number of digits
 
@@ -8,6 +9,7 @@ pressure = float(input("pressure (psi): "))
 volume = float(input("Total volume (liters): "))
 iMix = float(input("Percent water: "))
 emptyMass = float(input("Empty weight (kg): "))
+rocketRadius = float(input("Rocket Radius (cm): "))
 nozzleRadius = float(input("Nozzle radius (cm): "))
 
 iMix = iMix/100 #Changing to percent decimal
@@ -15,6 +17,7 @@ pressure = pressure*6895 #Converting to Pa
 pressureInitial = pressure
 volume = volume*1e-3 #Converting to M^3
 nozzleRadius = nozzleRadius*1e-2 #Converting to M
+rocketRadius = rocketRadius*1e-2 #Converting to M
 
 airvolume = volume*(1-iMix)
 airvolumeInitial = airvolume
@@ -29,7 +32,8 @@ pos = 0
 watVel = 0
 volumeFlowRate = 0
 massFlowRate = 0
-force = 0
+thrustForce = 0
+airResistance = 0
 weight = 0
 mass = 0
 latentLiftoff = False
@@ -46,9 +50,10 @@ while 1:
         break
     airvolume = airvolume+(volumeFlowRate*timeStep)
     pressure = (pressureInitial*airvolumeInitial)/airvolume
-    force = pi*pow(nozzleRadius,2)*pressure
+    thrustForce = pi*pow(nozzleRadius,2)*pressure
+    airResistance = .5*airDensity*pow(vel,2)*pi*pow(rocketRadius,2)
     mass = emptyMass+(watVolume*watDensity)
-    acc = (force-(mass*gravity))/mass
+    acc = (thrustForce-(mass*gravity)-airResistance)/mass
     if(acc>maxAcc):
         maxAcc=acc
     vel = vel+(acc*timeStep)
@@ -61,13 +66,6 @@ while 1:
             latentLiftoffWatPercentage = (watVolume/watVolumeInitial)*100
             latentRecorded = True
     pos = pos+(vel*timeStep)
-
-#Time step: .001
-#pressure (psi): 100
-#Total volume (liters): 100
-#Percent water: 60
-#Empty weight (kg): 5
-#Nozzle radius (cm): 1
 
 burnTime = time
 maxVel = vel
@@ -82,4 +80,5 @@ if(latentLiftoff and not latentRecorded):
     print("NEVER TOOK OFF")
 if(latentLiftoff):
     print("Time till liftoff: "+str(round(burnTime,accuracy))+" seconds\nLiftoff Water Percentage: "+str(round(latentLiftoffWatPercentage,accuracy))+"%")
-raw_input("Burn time: "+str(round(burnTime,accuracy))+" seconds\nMax G-force: "+str(round(maxAcc/9.8,accuracy))+" g's\nMax Velocity: "+str(round(maxVel,accuracy))+" m/s ("+str(round(maxVel*2.237,accuracy))+" mph)"+"\nTime to peak: "+str(round(time,accuracy))+" seconds\nPeak Height: "+str(round(pos*3.281,accuracy))+" ft")
+print("Rocket Height: "+str(round(volume/(pi*pow(rocketRadius,2)),accuracy))+" m")
+input("Burn time: "+str(round(burnTime,accuracy))+" seconds\nMax G-Force: "+str(round(maxAcc/9.8,accuracy))+" g's\nMax Velocity: "+str(round(maxVel,accuracy))+" m/s ("+str(round(maxVel*2.237,accuracy))+" mph)"+"\nTime to peak: "+str(round(time,accuracy))+" seconds\nPeak Height: "+str(round(pos*3.281,accuracy))+" ft")

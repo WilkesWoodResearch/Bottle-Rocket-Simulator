@@ -1,0 +1,3 @@
+=====ADD=====
+-Air density change vs altitude
+-Gravity change vs altitude
