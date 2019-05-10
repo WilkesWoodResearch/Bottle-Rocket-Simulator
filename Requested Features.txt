@@ -1,3 +1,4 @@
 =====ADD=====
 -Air density change vs altitude
--Gravity change vs altitude
+- Gravity change vs altitude (I think done?)
+-Steam rocket mode
